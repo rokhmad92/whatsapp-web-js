@@ -1,3 +1,6 @@
+.wwebjs_cache/
+authSession/
 node_modules/
 package-lock.json
 .env
+.DS_Store
