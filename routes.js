@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { client, MessageMedia, getQrString } = require('./whatsapp');
 
 // Middleware API Key
 function apiKeyMiddleware(req, res, next) {
