@@ -1,5 +1,6 @@
 .wwebjs_cache/
-authSession/
+auth_session/
+message_ack/
 node_modules/
 package-lock.json
 .env

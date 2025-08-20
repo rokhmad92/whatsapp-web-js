@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { client, MessageMedia, getQrString } = require('./whatsapp');
 
 // Middleware API Key
 function apiKeyMiddleware(req, res, next) {
@@ -34,12 +33,14 @@ router.post('/message', async (req, res) => {
     let message = null;
 
     if (image) {
-      // Form URL
       const media = await MessageMedia.fromUrl(image);
       await client.sendMessage(phone, media, { caption: pesan });
     } else {
       message = await client.sendMessage(phone, pesan);
     }
+
+    // messageIdToBroadcastId.set(message.id._serialized, id);
+    // saveMapping(message.id._serialized, id);
 
     return res.status(201).json({
       status: 201,
@@ -51,5 +52,35 @@ router.post('/message', async (req, res) => {
     return res.status(200).json({ status: 500, message: `Terjadi kesalahan - ${nomer} - ${error}` });
   }
 });
+
+// const path = require('path');
+// const fs = require('fs');
+// const { client, MessageMedia, getQrString } = require('./whatsapp');
+// const messageIdToBroadcastId = require('./message_map');
+
+// router.get('/message/:id', (req, res) => {
+//   const filePath = path.join(__dirname, 'message_ack', `${req.params.id}.json`);
+
+//   try {
+//     if (!fs.existsSync(filePath)) return res.json([]);
+
+//     const data = fs.readFileSync(filePath, 'utf-8');
+//     const parsed = data ? JSON.parse(data) : [];
+//     res.json(parsed);
+//   } catch (err) {
+//     res.status(500).json({ error: 'Gagal membaca file' });
+//   }
+// });
+
+
+// const mappingPath = path.join(__dirname, 'message_mapping.json');
+// function saveMapping(messageId, broadcastId) {
+//   let mappings = {};
+//   if (fs.existsSync(mappingPath)) {
+//     mappings = JSON.parse(fs.readFileSync(mappingPath));
+//   }
+//   mappings[messageId] = broadcastId;
+//   fs.writeFileSync(mappingPath, JSON.stringify(mappings, null, 2));
+// }
 
 module.exports = router;
