@@ -6,7 +6,17 @@ const client = new Client({
   puppeteer: {
     restartOnAuthFail: true,
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-extensions'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-extensions',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--no-zygote',
+      '--single-process',
+      '--no-first-run',
+      '--no-default-browser-check',
+    ],
   },
   authStrategy: new LocalAuth({ dataPath: 'auth_session' }),
 });

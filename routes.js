@@ -14,13 +14,19 @@ function apiKeyMiddleware(req, res, next) {
 
 router.use(apiKeyMiddleware);
 
-router.get('/get-qr', (req, res) => {
-  const qr = getQrString();
-  if (qr) {
-    res.json({ data: qr });
-  } else {
-    res.json({ data: 200 });
+router.get('/get-qr', async (req, res) => {
+  const state = await client.getState().catch(() => 'NOT_READY');
+
+  if (state === 'CONNECTED') {
+    return res.json({ status: 'authenticated' });
   }
+
+  const qrString = getQrString();
+  if (qrString) {
+    return res.json({ status: 'qr', data: qrString });
+  }
+
+  res.json({ status: 'pending' });
 });
 
 router.post('/message', async (req, res) => {
@@ -54,6 +60,24 @@ router.post('/message', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  try {
+    await client.logout();
+    await client.initialize();
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Berhasil logout dari WhatsApp',
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    return res.status(500).json({
+      status: 500,
+      message: `Gagal logout - ${error.message}`,
+    });
+  }
+});
+
 // const path = require('path');
 // const fs = require('fs');
 // const { client, MessageMedia, getQrString } = require('./whatsapp');
@@ -72,7 +96,6 @@ router.post('/message', async (req, res) => {
 //     res.status(500).json({ error: 'Gagal membaca file' });
 //   }
 // });
-
 
 // const mappingPath = path.join(__dirname, 'message_mapping.json');
 // function saveMapping(messageId, broadcastId) {
